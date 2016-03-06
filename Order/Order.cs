@@ -52,23 +52,36 @@ namespace Order
             #region init
             List<int> result = new List<int>();
             var orderList = this._order.OrderDataGet();
-            int totalPage = orderList.Count() / rows + 1;
-            int pageSum = 0;
-            IEnumerable pageList;
+            int totalPage = TotalPageCountGet(rows, orderList.Count());
+            //int pageSum = 0;
+            //IEnumerable pageList;
             #endregion
 
             for (int Loop = 1; Loop <= totalPage; Loop++)
             {
-                pageList = orderList.Skip((Loop - 1) * rows).Take(rows).Select(name);
-                pageSum = 0;
-                foreach (var item in pageList)
-                {
-                    pageSum += (int)item;
-                }
-                result.Add(pageSum);
+                //System.Linq.Dynamic
+                //pageList = orderList.Skip((Loop - 1) * rows)
+                //                    .Take(rows)
+                //                    .Select(name);
+                //foreach (var item in names)
+                //{
+                //    pageSum += (int)item;
+                //}
+                //result.Add(pageSum);
+
+                //反射 Reflection
+                result.Add(orderList.Skip((Loop - 1) * rows)
+                           .Take(rows)
+                           .Select(x => (int)x.GetType().GetProperty(name).GetValue(x)).Sum()
+                );
             }
 
             return result;
+        }
+
+        private static int TotalPageCountGet(int rows,int count)
+        {
+            return (int)Math.Ceiling((double)count / rows);
         }
 
     }
